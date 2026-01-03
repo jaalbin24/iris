@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "iris"
+version = "1.0.0"
+description = "Terminal UI library for CLI tools"
+authors = ["Jeremy Albin <jeremy.albin@kriib.com>"]
+readme = "README.md"
+packages = [{ include = "iris", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
