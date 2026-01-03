@@ -72,9 +72,7 @@ def prompt(message: str, mask: bool = False, default: str = "") -> str:
         >>> password = prompt("Repository password", mask=True)
         [?] Repository password: ********
     """
-    prompt_text = (
-        f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}: {RESET}"
-    )
+    prompt_text = f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}: {RESET}"
 
     with _print_lock:
         print(prompt_text, end="", flush=True)
@@ -96,9 +94,7 @@ def prompt(message: str, mask: bool = False, default: str = "") -> str:
     return response
 
 
-def prompt_choice(
-    message: str, choices: list[str], default: int = 0
-) -> int:
+def prompt_choice(message: str, choices: list[str], default: int = 0) -> int:
     """
     Ask user to choose from a list of options.
 
@@ -118,9 +114,7 @@ def prompt_choice(
             3) all
         Choice [1]: 2
     """
-    prompt_header = (
-        f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}{RESET}"
-    )
+    prompt_header = f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}{RESET}"
 
     with _print_lock:
         print(prompt_header, flush=True)

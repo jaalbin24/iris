@@ -46,9 +46,7 @@ class Table:
             ValueError: If number of values doesn't match columns
         """
         if len(values) != len(self._columns):
-            raise ValueError(
-                f"Expected {len(self._columns)} values, got {len(values)}"
-            )
+            raise ValueError(f"Expected {len(self._columns)} values, got {len(values)}")
         self._rows.append(list(values))
 
     def _calculate_widths(self) -> list[int]:

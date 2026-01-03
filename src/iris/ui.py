@@ -172,9 +172,7 @@ class UI:
             return default
         return prompts_module.prompt(message, mask, default)
 
-    def prompt_choice(
-        self, message: str, choices: list[str], default: int = 0
-    ) -> int:
+    def prompt_choice(self, message: str, choices: list[str], default: int = 0) -> int:
         """
         Ask user to choose from options.
 

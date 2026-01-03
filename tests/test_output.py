@@ -1,6 +1,5 @@
 """Tests for iris.output module."""
 
-
 from iris import (
     command,
     debug,

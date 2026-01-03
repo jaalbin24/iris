@@ -190,9 +190,7 @@ def dry_run(message: str) -> None:
     _safe_print(output)
 
 
-def step(
-    current: int | str, total: int | str, message: str
-) -> None:
+def step(current: int | str, total: int | str, message: str) -> None:
     """
     Print workflow step indicator.
 
