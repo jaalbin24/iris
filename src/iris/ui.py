@@ -2,8 +2,8 @@
 Stateful UI context for CLI applications.
 """
 
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 from . import output
 from . import prompts as prompts_module

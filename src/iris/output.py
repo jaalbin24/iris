@@ -4,7 +4,6 @@ Thread-safe output functions for terminal UI.
 
 import sys
 import threading
-from typing import Union
 
 from .colors import (
     BOLD_BLUE,
@@ -192,7 +191,7 @@ def dry_run(message: str) -> None:
 
 
 def step(
-    current: Union[int, str], total: Union[int, str], message: str
+    current: int | str, total: int | str, message: str
 ) -> None:
     """
     Print workflow step indicator.

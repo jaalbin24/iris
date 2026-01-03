@@ -1,8 +1,5 @@
 """Tests for iris.output module."""
 
-import io
-import sys
-from unittest.mock import patch
 
 from iris import (
     command,

@@ -19,6 +19,8 @@ Example (stateful):
 """
 
 # Stateless output functions
+# Colors (for advanced usage)
+from .colors import Colors
 from .output import (
     command,
     debug,
@@ -34,20 +36,17 @@ from .output import (
     warning,
 )
 
-# Stateful UI class
-from .ui import UI
+# User prompts
+from .prompts import confirm, prompt, prompt_choice
 
 # Table rendering
 from .table import Table
 
-# User prompts
-from .prompts import confirm, prompt, prompt_choice
+# Stateful UI class
+from .ui import UI
 
 # Utilities
 from .utils import format_age, format_duration, format_size
-
-# Colors (for advanced usage)
-from .colors import Colors
 
 __version__ = "1.0.0"
 

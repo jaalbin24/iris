@@ -3,7 +3,6 @@ User input prompts for terminal UI.
 """
 
 import getpass
-import sys
 import threading
 
 from .colors import BOLD_WHITE, BOLD_YELLOW, RESET, YELLOW

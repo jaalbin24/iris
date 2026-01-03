@@ -2,7 +2,6 @@
 Table rendering for terminal output.
 """
 
-import sys
 import threading
 
 from .colors import BOLD_WHITE, RESET
@@ -79,7 +78,7 @@ class Table:
         for row in self._rows:
             row_parts = []
             for i, value in enumerate(row):
-                row_parts.append(f"{str(value):<{widths[i]}}")
+                row_parts.append(f"{value!s:<{widths[i]}}")
             data_lines.append("  ".join(row_parts))
 
         # Print with thread safety
@@ -110,7 +109,7 @@ class Table:
 
         # Data rows
         for row in self._rows:
-            row_parts = [f"{str(value):<{widths[i]}}" for i, value in enumerate(row)]
+            row_parts = [f"{value!s:<{widths[i]}}" for i, value in enumerate(row)]
             lines.append("  ".join(row_parts))
 
         return "\n".join(lines)

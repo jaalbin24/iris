@@ -146,7 +146,7 @@ class TestUIProgress:
         with ui.progress(["Step1"]) as p:
             try:
                 p.start("UnknownStep")
-                assert False, "Should have raised ValueError"
+                raise AssertionError("Should have raised ValueError")
             except ValueError as e:
                 assert "Unknown step" in str(e)
 
