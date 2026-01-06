@@ -2,11 +2,27 @@
 Stateful UI context for CLI applications.
 """
 
+import sys
+import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
+from typing import ClassVar
 
 from . import output
 from . import prompts as prompts_module
+from .colors import (
+    BOLD_CYAN,
+    BOLD_GREEN,
+    BOLD_RED,
+    BOLD_YELLOW,
+    CLEAR_LINE,
+    CURSOR_HIDE,
+    CURSOR_SHOW,
+    CURSOR_UP,
+    RESET,
+    WHITE,
+)
+from .output import _print_lock
 from .table import Table
 
 
@@ -66,6 +82,167 @@ class ProgressContext:
             output.error(f"{step} failed: {error}")
         else:
             output.error(f"{step} failed")
+
+
+class StatusListContext:
+    """
+    Context for live-updating status list.
+
+    Displays multiple items with status indicators that update in place.
+    Used with UI.status_list() context manager.
+
+    Example:
+        >>> with ui.status_list(["vm-web", "vm-db"]) as status:
+        ...     status.update("vm-web", "running")
+        ...     status.update("vm-web", "success", detail="10.0.0.5")
+    """
+
+    STATES: ClassVar[set[str]] = {
+        "pending",
+        "running",
+        "success",
+        "error",
+        "warning",
+        "skipped",
+    }
+    SPINNER_FRAMES: ClassVar[str] = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    ICONS: ClassVar[dict[str, str]] = {
+        "pending": "○",
+        "success": "✓",
+        "error": "✘",
+        "warning": "!",
+        "skipped": "⊘",
+    }
+    COLORS: ClassVar[dict[str, str]] = {
+        "pending": WHITE,
+        "running": BOLD_CYAN,
+        "success": BOLD_GREEN,
+        "error": BOLD_RED,
+        "warning": BOLD_YELLOW,
+        "skipped": WHITE,
+    }
+
+    def __init__(self, items: list[str], ui: "UI"):
+        """
+        Initialize status list context.
+
+        Args:
+            items: List of item names to track
+            ui: Parent UI instance
+        """
+        self._items = items
+        self._ui = ui
+        self._states: dict[str, str] = {item: "pending" for item in items}
+        self._details: dict[str, str] = {}
+        self._spinner_index = 0
+        self._spinner_thread: threading.Thread | None = None
+        self._stop_spinner = threading.Event()
+        self._is_tty = sys.stdout.isatty()
+        self._rendered = False
+        self._max_item_width = max(len(item) for item in items) if items else 0
+
+    def update(self, item: str, state: str, detail: str = "") -> None:
+        """
+        Update an item's state.
+
+        Args:
+            item: Name of the item (must be in the items list)
+            state: New state (pending, running, success, error, warning, skipped)
+            detail: Optional detail string (e.g., IP address, error message)
+
+        Raises:
+            ValueError: If item is unknown or state is invalid
+        """
+        if item not in self._states:
+            raise ValueError(f"Unknown item: {item}")
+        if state not in self.STATES:
+            raise ValueError(f"Invalid state: {state}. Must be one of {self.STATES}")
+
+        self._states[item] = state
+        if detail:
+            self._details[item] = detail
+        elif item in self._details and state != "running":
+            # Clear detail when state changes (except for running)
+            pass  # Keep existing detail
+
+        if self._is_tty:
+            self._render_all()
+        else:
+            # Non-TTY: print each state change as a new line
+            line = self._render_line(item)
+            with _print_lock:
+                print(line, flush=True)
+
+    def _render_all(self) -> None:
+        """Redraw all lines (TTY mode only)."""
+        with _print_lock:
+            # Move cursor up if we've rendered before
+            if self._rendered:
+                print(CURSOR_UP.format(len(self._items)), end="", flush=True)
+
+            # Clear and reprint each line
+            for item in self._items:
+                line = self._render_line(item)
+                print(f"{CLEAR_LINE}\r{line}", flush=True)
+
+            self._rendered = True
+
+    def _render_line(self, item: str) -> str:
+        """Format a single status line."""
+        state = self._states[item]
+        color = self.COLORS[state]
+
+        # Get icon (spinner for running state)
+        if state == "running":
+            icon = self.SPINNER_FRAMES[self._spinner_index]
+        else:
+            icon = self.ICONS[state]
+
+        # Build line with consistent formatting
+        detail = self._details.get(item, "")
+        if detail:
+            if state == "error":
+                detail_str = f": {detail}"
+            else:
+                detail_str = f"  ({detail})"
+        else:
+            detail_str = ""
+
+        return f"{color}{icon}{RESET} {item:<{self._max_item_width}}  {color}{state}{RESET}{detail_str}"
+
+    def _start_spinner(self) -> None:
+        """Start background spinner animation thread."""
+        if not self._is_tty:
+            return
+
+        # Hide cursor during animation
+        with _print_lock:
+            print(CURSOR_HIDE, end="", flush=True)
+
+        self._spinner_thread = threading.Thread(target=self._spinner_loop, daemon=True)
+        self._spinner_thread.start()
+
+    def _stop_spinner_thread(self) -> None:
+        """Stop spinner thread and show cursor."""
+        self._stop_spinner.set()
+        if self._spinner_thread is not None:
+            self._spinner_thread.join(timeout=0.2)
+
+        if self._is_tty:
+            # Show cursor and do final render
+            with _print_lock:
+                print(CURSOR_SHOW, end="", flush=True)
+
+    def _spinner_loop(self) -> None:
+        """Background thread: update spinner frame every 80ms."""
+        while not self._stop_spinner.wait(0.08):
+            # Check if any items are in running state
+            has_running = any(s == "running" for s in self._states.values())
+            if has_running:
+                self._spinner_index = (self._spinner_index + 1) % len(
+                    self.SPINNER_FRAMES
+                )
+                self._render_all()
 
 
 class UI:
@@ -202,6 +379,35 @@ class UI:
         """
         ctx = ProgressContext(steps, self)
         yield ctx
+
+    @contextmanager
+    def status_list(self, items: list[str]) -> Iterator[StatusListContext]:
+        """
+        Context manager for live-updating status list.
+
+        Displays multiple items with status indicators that update in place.
+        In TTY mode, lines are redrawn. In non-TTY mode, each state change
+        prints a new line.
+
+        Args:
+            items: List of item names to track
+
+        Yields:
+            StatusListContext for updating item states
+
+        Example:
+            >>> with ui.status_list(["vm-web", "vm-db"]) as status:
+            ...     status.update("vm-web", "running")
+            ...     do_work()
+            ...     status.update("vm-web", "success", detail="10.0.0.5")
+        """
+        ctx = StatusListContext(items, self)
+        ctx._render_all()
+        ctx._start_spinner()
+        try:
+            yield ctx
+        finally:
+            ctx._stop_spinner_thread()
 
     # Table helper
     def table(self, columns: list[str]) -> Table:

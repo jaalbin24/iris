@@ -2,6 +2,8 @@
 
 from unittest.mock import patch
 
+import pytest
+
 from iris import UI
 
 
@@ -159,3 +161,120 @@ class TestUITable:
         ui = UI()
         table = ui.table(["Col1", "Col2"])
         assert table._columns == ["Col1", "Col2"]
+
+
+class TestStatusList:
+    """Test status_list context manager."""
+
+    def test_initial_render(self, capsys):
+        """Test initial pending state render."""
+        ui = UI()
+        with ui.status_list(["item1", "item2"]):
+            pass
+        captured = capsys.readouterr()
+        assert "item1" in captured.out
+        assert "item2" in captured.out
+        assert "pending" in captured.out
+
+    def test_update_success(self, capsys):
+        """Test updating to success state."""
+        ui = UI()
+        with ui.status_list(["item1"]) as status:
+            status.update("item1", "success")
+        captured = capsys.readouterr()
+        assert "✓" in captured.out
+        assert "success" in captured.out
+
+    def test_update_with_detail(self, capsys):
+        """Test update with detail string."""
+        ui = UI()
+        with ui.status_list(["item1"]) as status:
+            status.update("item1", "success", detail="10.0.0.5")
+        captured = capsys.readouterr()
+        assert "10.0.0.5" in captured.out
+
+    def test_update_error(self, capsys):
+        """Test error state."""
+        ui = UI()
+        with ui.status_list(["item1"]) as status:
+            status.update("item1", "error", detail="timeout")
+        captured = capsys.readouterr()
+        assert "✘" in captured.out
+        assert "timeout" in captured.out
+
+    def test_update_warning(self, capsys):
+        """Test warning state."""
+        ui = UI()
+        with ui.status_list(["item1"]) as status:
+            status.update("item1", "warning")
+        captured = capsys.readouterr()
+        assert "!" in captured.out
+        assert "warning" in captured.out
+
+    def test_update_skipped(self, capsys):
+        """Test skipped state."""
+        ui = UI()
+        with ui.status_list(["item1"]) as status:
+            status.update("item1", "skipped")
+        captured = capsys.readouterr()
+        assert "⊘" in captured.out
+        assert "skipped" in captured.out
+
+    def test_unknown_item_raises(self):
+        """Test unknown item raises ValueError."""
+        ui = UI()
+        with (
+            ui.status_list(["item1"]) as status,
+            pytest.raises(ValueError, match="Unknown item"),
+        ):
+            status.update("unknown", "success")
+
+    def test_invalid_state_raises(self):
+        """Test invalid state raises ValueError."""
+        ui = UI()
+        with (
+            ui.status_list(["item1"]) as status,
+            pytest.raises(ValueError, match="Invalid state"),
+        ):
+            status.update("item1", "invalid_state")
+
+    def test_all_states(self, capsys):
+        """Test all valid states render without error."""
+        ui = UI()
+        states = ["pending", "running", "success", "error", "warning", "skipped"]
+        with ui.status_list(["item"]) as status:
+            for state in states:
+                status.update("item", state)
+        # Verify no exceptions raised and output contains expected content
+        captured = capsys.readouterr()
+        assert "item" in captured.out
+
+    def test_multiple_items(self, capsys):
+        """Test multiple items with different states."""
+        ui = UI()
+        with ui.status_list(["vm-web", "vm-db", "vm-cache"]) as status:
+            status.update("vm-web", "success")
+            status.update("vm-db", "running")
+            status.update("vm-cache", "error", detail="timeout")
+        captured = capsys.readouterr()
+        assert "vm-web" in captured.out
+        assert "vm-db" in captured.out
+        assert "vm-cache" in captured.out
+
+    def test_spinner_stops_on_exception(self):
+        """Test spinner thread stops even if exception raised."""
+        ui = UI()
+        try:
+            with ui.status_list(["item"]) as status:
+                status.update("item", "running")
+                raise RuntimeError("test error")
+        except RuntimeError:
+            pass
+        # If spinner thread didn't stop, test would hang or leave zombie thread
+
+    def test_empty_list(self):
+        """Test empty items list."""
+        ui = UI()
+        with ui.status_list([]):
+            pass
+        # Should not crash with empty list

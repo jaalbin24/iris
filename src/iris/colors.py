@@ -24,6 +24,12 @@ class Colors:
 
     RESET = "\033[0m"
 
+    # Terminal control sequences
+    CURSOR_UP = "\033[{}A"  # Move cursor up n lines (use .format(n))
+    CLEAR_LINE = "\033[2K"  # Clear entire line
+    CURSOR_HIDE = "\033[?25l"  # Hide cursor
+    CURSOR_SHOW = "\033[?25h"  # Show cursor
+
 
 # Module-level exports for convenience
 RED = Colors.RED
@@ -41,3 +47,7 @@ BOLD_MAGENTA = Colors.BOLD_MAGENTA
 BOLD_CYAN = Colors.BOLD_CYAN
 BOLD_WHITE = Colors.BOLD_WHITE
 RESET = Colors.RESET
+CURSOR_UP = Colors.CURSOR_UP
+CLEAR_LINE = Colors.CLEAR_LINE
+CURSOR_HIDE = Colors.CURSOR_HIDE
+CURSOR_SHOW = Colors.CURSOR_SHOW

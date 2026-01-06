@@ -43,7 +43,7 @@ from .prompts import confirm, prompt, prompt_choice
 from .table import Table
 
 # Stateful UI class
-from .ui import UI
+from .ui import UI, StatusListContext
 
 # Utilities
 from .utils import format_age, format_duration, format_size
@@ -66,6 +66,7 @@ __all__ = [
     "duration",
     # Classes
     "UI",
+    "StatusListContext",
     "Table",
     "Colors",
     # Prompts
