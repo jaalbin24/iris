@@ -24,6 +24,9 @@ class Colors:
 
     RESET = "\033[0m"
 
+    # Background colors
+    BG_RED = "\033[41m"
+
     # Terminal control sequences
     CURSOR_UP = "\033[{}A"  # Move cursor up n lines (use .format(n))
     CLEAR_LINE = "\033[2K"  # Clear entire line
@@ -47,6 +50,7 @@ BOLD_MAGENTA = Colors.BOLD_MAGENTA
 BOLD_CYAN = Colors.BOLD_CYAN
 BOLD_WHITE = Colors.BOLD_WHITE
 RESET = Colors.RESET
+BG_RED = Colors.BG_RED
 CURSOR_UP = Colors.CURSOR_UP
 CLEAR_LINE = Colors.CLEAR_LINE
 CURSOR_HIDE = Colors.CURSOR_HIDE

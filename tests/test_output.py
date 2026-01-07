@@ -1,7 +1,9 @@
 """Tests for iris.output module."""
 
 from iris import (
+    box,
     command,
+    danger_banner,
     debug,
     dry_run,
     duration,
@@ -110,3 +112,33 @@ class TestOutputFunctions:
         captured = capsys.readouterr()
         assert "═" in captured.out
         assert "Test Header" in captured.out
+
+    def test_box_format(self, capsys):
+        """Test box format with double-line borders."""
+        box("Test Box")
+        captured = capsys.readouterr()
+        assert "╔" in captured.out
+        assert "╗" in captured.out
+        assert "║" in captured.out
+        assert "╚" in captured.out
+        assert "╝" in captured.out
+        assert "═" in captured.out
+        assert "Test Box" in captured.out
+
+    def test_box_multiline(self, capsys):
+        """Test box with multiple lines."""
+        box("Line 1\nLine 2")
+        captured = capsys.readouterr()
+        assert "Line 1" in captured.out
+        assert "Line 2" in captured.out
+        # Should have exactly 2 content lines between borders
+        lines = captured.out.strip().split("\n")
+        assert len(lines) == 4  # top border + 2 content + bottom border
+
+    def test_danger_banner_format(self, capsys):
+        """Test danger_banner uses box with red background."""
+        danger_banner("ALERT")
+        captured = capsys.readouterr()
+        assert "╔" in captured.out
+        assert "ALERT" in captured.out
+        assert "\033[41m" in captured.out  # BG_RED

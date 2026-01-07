@@ -79,6 +79,14 @@ class TestUIOutput:
         captured = capsys.readouterr()
         assert captured.err == ""
 
+    def test_danger_banner(self, capsys):
+        """Test UI danger_banner output."""
+        ui = UI()
+        ui.danger_banner("CRITICAL")
+        captured = capsys.readouterr()
+        assert "CRITICAL" in captured.out
+        assert "\033[41m" in captured.out  # BG_RED
+
 
 class TestUIPrompts:
     """Test UI prompt methods."""

@@ -328,6 +328,10 @@ class UI:
         """Print elapsed time."""
         output.duration(seconds)
 
+    def danger_banner(self, message: str) -> None:
+        """Print a danger banner with red background."""
+        output.danger_banner(message)
+
     # Prompt methods - respect interactive mode
     def confirm(self, message: str, default: bool = False) -> bool:
         """

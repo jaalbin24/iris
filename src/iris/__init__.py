@@ -22,7 +22,9 @@ Example (stateful):
 # Colors (for advanced usage)
 from .colors import Colors
 from .output import (
+    box,
     command,
+    danger_banner,
     debug,
     dry_run,
     duration,
@@ -64,6 +66,8 @@ __all__ = [
     "dry_run",
     "step",
     "duration",
+    "box",
+    "danger_banner",
     # Classes
     "UI",
     "StatusListContext",

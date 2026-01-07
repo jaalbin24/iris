@@ -2,10 +2,12 @@
 Thread-safe output functions for terminal UI.
 """
 
+import shutil
 import sys
 import threading
 
 from .colors import (
+    BG_RED,
     BOLD_BLUE,
     BOLD_CYAN,
     BOLD_GREEN,
@@ -33,22 +35,24 @@ def _safe_print(message: str, file=None) -> None:
 
 def header(message: str) -> None:
     """
-    Print a section header with decorative lines.
+    Print a section header with decorative lines spanning terminal width.
 
     Args:
         message: Header text to display
 
     Example:
         >>> header("Creating Backup")
-        ═══════════════════════════════════════════════════════════════════
+        ════════════════════════════════════════════════════════════════════════════════
           Creating Backup
-        ═══════════════════════════════════════════════════════════════════
+        ════════════════════════════════════════════════════════════════════════════════
     """
+    width = shutil.get_terminal_size().columns
+    line = "═" * width
     output = (
         f"\n"
-        f"{BOLD_BLUE}═══════════════════════════════════════════════════════════════════{RESET}\n"
+        f"{BOLD_BLUE}{line}{RESET}\n"
         f"{BOLD_BLUE}  {message}{RESET}\n"
-        f"{BOLD_BLUE}═══════════════════════════════════════════════════════════════════{RESET}\n"
+        f"{BOLD_BLUE}{line}{RESET}\n"
     )
     _safe_print(output)
 
@@ -220,3 +224,53 @@ def duration(seconds: float) -> None:
     """
     output = f"{CYAN}[TIME] Completed in {seconds:.1f}s{RESET}"
     _safe_print(output)
+
+
+def box(message: str, bg_color: str = "", fg_color: str = BOLD_WHITE) -> None:
+    """
+    Print a full-width box with double-line borders.
+
+    Args:
+        message: Text to display (supports multi-line via newlines).
+        bg_color: Background ANSI code (e.g., BG_RED). Empty for no background.
+        fg_color: Foreground ANSI code. Defaults to bold white.
+
+    Example:
+        >>> box("ALERT")
+        ╔════════════════════════════════════════════╗
+        ║                   ALERT                    ║
+        ╚════════════════════════════════════════════╝
+
+        >>> box("WARNING", bg_color=BG_RED)
+        # Same but with red background
+    """
+    width = shutil.get_terminal_size().columns
+    lines = message.split("\n")
+    style = f"{bg_color}{fg_color}"
+
+    inner_width = width - 2
+    output_lines = []
+
+    output_lines.append(f"{style}╔{'═' * inner_width}╗{RESET}")
+    for line in lines:
+        output_lines.append(f"{style}║{line.center(inner_width)}║{RESET}")
+    output_lines.append(f"{style}╚{'═' * inner_width}╝{RESET}")
+
+    _safe_print("\n".join(output_lines))
+
+
+def danger_banner(message: str) -> None:
+    """
+    Print a full-width danger banner with red background and border.
+
+    Args:
+        message: Message to display. Supports multi-line via newlines.
+
+    Example:
+        >>> danger_banner("ALL HOSTS TARGETED")
+        # Outputs red bordered banner spanning terminal width
+
+        >>> danger_banner("WARNING\\nThis cannot be undone")
+        # Outputs multi-line red bordered banner
+    """
+    box(message, bg_color=BG_RED)
