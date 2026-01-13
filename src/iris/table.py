@@ -2,12 +2,8 @@
 Table rendering for terminal output.
 """
 
-import threading
-
+from ._console import _get_console
 from .colors import BOLD_WHITE, RESET
-
-# Thread lock for safe parallel printing
-_print_lock = threading.Lock()
 
 
 class Table:
@@ -80,7 +76,7 @@ class Table:
             data_lines.append("  ".join(row_parts))
 
         # Print with thread safety
-        with _print_lock:
+        with _get_console()._lock:
             print(header, flush=True)
             print(separator, flush=True)
             for line in data_lines:

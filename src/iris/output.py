@@ -2,35 +2,7 @@
 Thread-safe output functions for terminal UI.
 """
 
-import shutil
-import sys
-import threading
-
-from .colors import (
-    BG_RED,
-    BOLD_BLUE,
-    BOLD_CYAN,
-    BOLD_GREEN,
-    BOLD_MAGENTA,
-    BOLD_RED,
-    BOLD_WHITE,
-    BOLD_YELLOW,
-    CYAN,
-    GREEN,
-    MAGENTA,
-    RED,
-    RESET,
-    YELLOW,
-)
-
-# Thread lock for safe parallel printing
-_print_lock = threading.Lock()
-
-
-def _safe_print(message: str, file=None) -> None:
-    """Thread-safe print function with lock."""
-    with _print_lock:
-        print(message, file=file if file else sys.stdout, flush=True)
+from ._console import _get_console
 
 
 def header(message: str) -> None:
@@ -46,15 +18,7 @@ def header(message: str) -> None:
           Creating Backup
         ════════════════════════════════════════════════════════════════════════════════
     """
-    width = shutil.get_terminal_size().columns
-    line = "═" * width
-    output = (
-        f"\n"
-        f"{BOLD_BLUE}{line}{RESET}\n"
-        f"{BOLD_BLUE}  {message}{RESET}\n"
-        f"{BOLD_BLUE}{line}{RESET}\n"
-    )
-    _safe_print(output)
+    _get_console().header(message)
 
 
 def success(message: str) -> None:
@@ -68,8 +32,7 @@ def success(message: str) -> None:
         >>> success("Backup complete")
         [✓] Backup complete
     """
-    output = f"{BOLD_WHITE}[{BOLD_GREEN}✓{BOLD_WHITE}]{GREEN} {message}{RESET}"
-    _safe_print(output)
+    _get_console().success(message)
 
 
 def error(message: str) -> None:
@@ -83,8 +46,7 @@ def error(message: str) -> None:
         >>> error("Connection failed")
         [x] Connection failed
     """
-    output = f"{BOLD_WHITE}[{BOLD_RED}x{BOLD_WHITE}]{RED} {message}{RESET}"
-    _safe_print(output, file=sys.stderr)
+    _get_console().error(message)
 
 
 def warning(message: str) -> None:
@@ -98,8 +60,7 @@ def warning(message: str) -> None:
         >>> warning("Disk space low")
         [!] Disk space low
     """
-    output = f"{BOLD_WHITE}[{BOLD_YELLOW}!{BOLD_WHITE}]{YELLOW} {message}{RESET}"
-    _safe_print(output)
+    _get_console().warning(message)
 
 
 def info(message: str) -> None:
@@ -113,8 +74,7 @@ def info(message: str) -> None:
         >>> info("Using default configuration")
         [i] Using default configuration
     """
-    output = f"{BOLD_WHITE}[{BOLD_CYAN}i{BOLD_WHITE}]{CYAN} {message}{RESET}"
-    _safe_print(output)
+    _get_console().info(message)
 
 
 def hint(message: str) -> None:
@@ -128,8 +88,7 @@ def hint(message: str) -> None:
         >>> hint("Try: osiris --help")
         [+] Try: osiris --help
     """
-    output = f"{BOLD_WHITE}[{BOLD_MAGENTA}+{BOLD_WHITE}]{MAGENTA} {message}{RESET}"
-    _safe_print(output)
+    _get_console().hint(message)
 
 
 def command(cmd: str) -> None:
@@ -143,8 +102,7 @@ def command(cmd: str) -> None:
         >>> command("restic backup --stdin")
         [>] Running: restic backup --stdin
     """
-    output = f"{BOLD_CYAN}[>] Running: {cmd}{RESET}"
-    _safe_print(output)
+    _get_console().command(cmd)
 
 
 def debug(message: str, enabled: bool = False) -> None:
@@ -160,8 +118,7 @@ def debug(message: str, enabled: bool = False) -> None:
         [DEBUG] Variable value: foo
     """
     if enabled:
-        output = f"{CYAN}[DEBUG] {message}{RESET}"
-        _safe_print(output, file=sys.stderr)
+        _get_console().debug(message)
 
 
 def secure(message: str) -> None:
@@ -175,8 +132,7 @@ def secure(message: str) -> None:
         >>> secure("Encryption key loaded")
         [S] Encryption key loaded
     """
-    output = f"{BOLD_WHITE}[{BOLD_GREEN}S{BOLD_WHITE}]{GREEN} {message}{RESET}"
-    _safe_print(output)
+    _get_console().secure(message)
 
 
 def dry_run(message: str) -> None:
@@ -190,8 +146,7 @@ def dry_run(message: str) -> None:
         >>> dry_run("Would delete 5 old backups")
         [DRY-RUN] Would: Would delete 5 old backups
     """
-    output = f"{MAGENTA}[DRY-RUN] Would: {message}{RESET}"
-    _safe_print(output)
+    _get_console().dry_run(message)
 
 
 def step(current: int | str, total: int | str, message: str) -> None:
@@ -207,8 +162,7 @@ def step(current: int | str, total: int | str, message: str) -> None:
         >>> step(1, 3, "Backing up PostgreSQL")
         [1/3] Backing up PostgreSQL
     """
-    output = f"{BOLD_WHITE}[{current}/{total}]{BOLD_BLUE} {message}{RESET}"
-    _safe_print(output)
+    _get_console().step(current, total, message)
 
 
 def duration(seconds: float) -> None:
@@ -222,11 +176,10 @@ def duration(seconds: float) -> None:
         >>> duration(42.5)
         [TIME] Completed in 42.5s
     """
-    output = f"{CYAN}[TIME] Completed in {seconds:.1f}s{RESET}"
-    _safe_print(output)
+    _get_console().duration(seconds)
 
 
-def box(message: str, bg_color: str = "", fg_color: str = BOLD_WHITE) -> None:
+def box(message: str, bg_color: str = "", fg_color: str = "") -> None:
     """
     Print a full-width box with double-line borders.
 
@@ -244,19 +197,9 @@ def box(message: str, bg_color: str = "", fg_color: str = BOLD_WHITE) -> None:
         >>> box("WARNING", bg_color=BG_RED)
         # Same but with red background
     """
-    width = shutil.get_terminal_size().columns
-    lines = message.split("\n")
-    style = f"{bg_color}{fg_color}"
+    from .colors import BOLD_WHITE
 
-    inner_width = width - 2
-    output_lines = []
-
-    output_lines.append(f"{style}╔{'═' * inner_width}╗{RESET}")
-    for line in lines:
-        output_lines.append(f"{style}║{line.center(inner_width)}║{RESET}")
-    output_lines.append(f"{style}╚{'═' * inner_width}╝{RESET}")
-
-    _safe_print("\n".join(output_lines))
+    _get_console().box(message, bg_color, fg_color if fg_color else BOLD_WHITE)
 
 
 def danger_banner(message: str) -> None:
@@ -273,4 +216,4 @@ def danger_banner(message: str) -> None:
         >>> danger_banner("WARNING\\nThis cannot be undone")
         # Outputs multi-line red bordered banner
     """
-    box(message, bg_color=BG_RED)
+    _get_console().danger_banner(message)

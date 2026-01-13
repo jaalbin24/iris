@@ -10,6 +10,7 @@ from typing import ClassVar
 
 from . import output
 from . import prompts as prompts_module
+from ._console import _get_console
 from .colors import (
     BOLD_CYAN,
     BOLD_GREEN,
@@ -22,7 +23,6 @@ from .colors import (
     RESET,
     WHITE,
 )
-from .output import _print_lock
 from .table import Table
 
 
@@ -170,12 +170,12 @@ class StatusListContext:
         else:
             # Non-TTY: print each state change as a new line
             line = self._render_line(item)
-            with _print_lock:
+            with _get_console()._lock:
                 print(line, flush=True)
 
     def _render_all(self) -> None:
         """Redraw all lines (TTY mode only)."""
-        with _print_lock:
+        with _get_console()._lock:
             # Move cursor up if we've rendered before
             if self._rendered:
                 print(CURSOR_UP.format(len(self._items)), end="", flush=True)
@@ -216,7 +216,7 @@ class StatusListContext:
             return
 
         # Hide cursor during animation
-        with _print_lock:
+        with _get_console()._lock:
             print(CURSOR_HIDE, end="", flush=True)
 
         self._spinner_thread = threading.Thread(target=self._spinner_loop, daemon=True)
@@ -230,7 +230,7 @@ class StatusListContext:
 
         if self._is_tty:
             # Show cursor and do final render
-            with _print_lock:
+            with _get_console()._lock:
                 print(CURSOR_SHOW, end="", flush=True)
 
     def _spinner_loop(self) -> None:
