@@ -21,6 +21,7 @@ Example (stateful):
 # Stateless output functions
 # Colors (for advanced usage)
 from .colors import Colors
+from .semantic import Semantic
 from .output import (
     box,
     command,
@@ -73,6 +74,7 @@ __all__ = [
     "StatusListContext",
     "Table",
     "Colors",
+    "Semantic",
     # Prompts
     "confirm",
     "prompt",

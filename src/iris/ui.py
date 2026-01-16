@@ -12,17 +12,13 @@ from . import output
 from . import prompts as prompts_module
 from ._console import _get_console
 from .colors import (
-    BOLD_CYAN,
-    BOLD_GREEN,
-    BOLD_RED,
-    BOLD_YELLOW,
     CLEAR_LINE,
     CURSOR_HIDE,
     CURSOR_SHOW,
     CURSOR_UP,
     RESET,
-    WHITE,
 )
+from .semantic import SEMANTIC_COLORS, Semantic
 from .table import Table
 
 
@@ -113,13 +109,13 @@ class StatusListContext:
         "warning": "!",
         "skipped": "⊘",
     }
-    COLORS: ClassVar[dict[str, str]] = {
-        "pending": WHITE,
-        "running": BOLD_CYAN,
-        "success": BOLD_GREEN,
-        "error": BOLD_RED,
-        "warning": BOLD_YELLOW,
-        "skipped": WHITE,
+    STATE_SEMANTICS: ClassVar[dict[str, Semantic]] = {
+        "pending": Semantic.MUTED,
+        "running": Semantic.INFO,
+        "success": Semantic.SUCCESS,
+        "error": Semantic.ERROR,
+        "warning": Semantic.WARNING,
+        "skipped": Semantic.MUTED,
     }
 
     def __init__(self, items: list[str], ui: "UI"):
@@ -190,7 +186,8 @@ class StatusListContext:
     def _render_line(self, item: str) -> str:
         """Format a single status line."""
         state = self._states[item]
-        color = self.COLORS[state]
+        semantic = self.STATE_SEMANTICS[state]
+        color = SEMANTIC_COLORS[semantic]
 
         # Get icon (spinner for running state)
         if state == "running":
