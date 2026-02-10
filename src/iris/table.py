@@ -53,9 +53,7 @@ class Table:
         self._rows: list[list[str]] = []
         self._column_semantics: dict[int, dict[str, Semantic]] = {}
 
-    def set_column_semantics(
-        self, column: int, mapping: dict[str, Semantic]
-    ) -> None:
+    def set_column_semantics(self, column: int, mapping: dict[str, Semantic]) -> None:
         """
         Set semantic coloring for values in a column.
 

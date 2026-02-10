@@ -171,7 +171,9 @@ class _Console:
 
     def prompt(self, message: str, mask: bool = False, default: str = "") -> str:
         """Ask for text input."""
-        prompt_text = f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}: {RESET}"
+        prompt_text = (
+            f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}: {RESET}"
+        )
 
         with self._lock:
             print(prompt_text, end="", file=sys.stdout, flush=True)
@@ -192,7 +194,9 @@ class _Console:
 
     def prompt_choice(self, message: str, choices: list[str], default: int = 0) -> int:
         """Ask user to choose from a list of options."""
-        prompt_header = f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}{RESET}"
+        prompt_header = (
+            f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}{RESET}"
+        )
 
         with self._lock:
             print(prompt_header, file=sys.stdout, flush=True)

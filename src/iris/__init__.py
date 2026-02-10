@@ -21,7 +21,6 @@ Example (stateful):
 # Stateless output functions
 # Colors (for advanced usage)
 from .colors import Colors
-from .semantic import Semantic
 from .output import (
     box,
     command,
@@ -41,6 +40,7 @@ from .output import (
 
 # User prompts
 from .prompts import confirm, prompt, prompt_choice
+from .semantic import Semantic
 
 # Table rendering
 from .table import Table
