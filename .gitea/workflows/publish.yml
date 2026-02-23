@@ -54,6 +54,7 @@ jobs:
           for file in dist/*; do
             echo "Uploading $(basename "$file")..."
             pulp --base-url "${{ vars.PULP_URL }}" \
+              --cert /etc/ssl/certs/ca-certificates.crt \
               --username "${{ secrets.PULP_USERNAME }}" \
               --password "${{ secrets.PULP_PASSWORD }}" \
               python content upload \
