@@ -41,6 +41,10 @@ jobs:
         with:
           python-version: "3.11"
       - uses: snok/install-poetry@v1
+      - name: Set version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          poetry version "$VERSION"
       - name: Build package
         run: poetry build
       - name: Install Pulp CLI
@@ -55,6 +59,7 @@ jobs:
             echo "Uploading $(basename "$file")..."
             pulp python content upload \
               --repository kriib-internal \
+              --relative-path "$(basename "$file")" \
               --file "$file"
           done
           echo "Published successfully!"
