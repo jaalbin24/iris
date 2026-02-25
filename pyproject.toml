@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "iris"
+name = "kriib-iris"
 version = "1.0.0"
 description = "Terminal UI library for CLI tools"
 authors = ["Jeremy Albin <jeremy.albin@kriib.com>"]
