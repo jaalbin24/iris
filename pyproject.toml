@@ -1,9 +1,13 @@
-[tool.poetry]
+[project]
 name = "kriib-iris"
 version = "1.0.0"
 description = "Terminal UI library for CLI tools"
-authors = ["Jeremy Albin <jeremy.albin@kriib.com>"]
 readme = "README.md"
+authors = [{name = "Jeremy Albin", email = "jeremy.albin@kriib.com"}]
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[tool.poetry]
 packages = [{ include = "iris", from = "src" }]
 
 [tool.poetry.dependencies]
