@@ -72,6 +72,20 @@ class TestPrompt:
             result = prompt("Enter value", default="fallback")
             assert result == "fallback"
 
+    def test_prompt_shows_default_in_text(self, capsys):
+        """Test that the default value appears in the prompt text."""
+        with patch("builtins.input", return_value=""):
+            prompt("Enter value", default="fallback")
+        output = capsys.readouterr().out
+        assert "[fallback]" in output
+
+    def test_prompt_masked_hides_default(self, capsys):
+        """Test that masked prompts do not show the default."""
+        with patch("getpass.getpass", return_value=""):
+            prompt("Password", mask=True, default="secret")
+        output = capsys.readouterr().out
+        assert "[secret]" not in output
+
     def test_prompt_masked(self):
         """Test masked prompt uses getpass."""
         with patch("getpass.getpass", return_value="secret"):

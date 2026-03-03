@@ -171,8 +171,9 @@ class _Console:
 
     def prompt(self, message: str, mask: bool = False, default: str = "") -> str:
         """Ask for text input."""
+        default_hint = f" [{default}]" if default and not mask else ""
         prompt_text = (
-            f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}: {RESET}"
+            f"{BOLD_WHITE}[{BOLD_YELLOW}?{BOLD_WHITE}]{YELLOW} {message}{default_hint}: {RESET}"
         )
 
         with self._lock:
