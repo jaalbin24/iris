@@ -53,13 +53,16 @@ class Table:
         self._rows: list[list[str]] = []
         self._column_semantics: dict[int, dict[str, Semantic]] = {}
 
-    def set_column_semantics(self, column: int, mapping: dict[str, Semantic]) -> None:
+    def set_column_semantics(
+        self, column: int, mapping: dict[str, Semantic | str]
+    ) -> None:
         """
         Set semantic coloring for values in a column.
 
         Args:
             column: Column index (0-based)
-            mapping: Dict mapping cell values to Semantic enum values
+            mapping: Dict mapping cell values to Semantic enum values or
+                     semantic names as strings (e.g. "success", "WARNING")
 
         Example:
             >>> table.set_column_semantics(1, {
@@ -68,7 +71,13 @@ class Table:
             ...     "error": Semantic.ERROR,
             ... })
         """
-        self._column_semantics[column] = mapping
+        resolved: dict[str, Semantic] = {}
+        for key, value in mapping.items():
+            if isinstance(value, str):
+                resolved[key] = Semantic(value.lower())
+            else:
+                resolved[key] = value
+        self._column_semantics[column] = resolved
 
     def add_row(self, *values: str) -> None:
         """

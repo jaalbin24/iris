@@ -2,7 +2,7 @@
 
 import pytest
 
-from iris import Table
+from iris import Semantic, Table
 
 
 class TestTable:
@@ -63,6 +63,19 @@ class TestTable:
         widths = table._calculate_widths()
         # "Description" header vs "A much longer description here"
         assert widths[1] == len("A much longer description here")
+
+    def test_set_column_semantics_with_strings(self):
+        """Test that string semantic names are coerced to Semantic enums."""
+        table = Table(["Name", "Status"])
+        table.set_column_semantics(1, {
+            "valid": "SUCCESS",
+            "expired": "warning",
+            "revoked": "Error",
+        })
+        mapping = table._column_semantics[1]
+        assert mapping["valid"] is Semantic.SUCCESS
+        assert mapping["expired"] is Semantic.WARNING
+        assert mapping["revoked"] is Semantic.ERROR
 
     def test_empty_table(self, capsys):
         """Test rendering empty table."""
