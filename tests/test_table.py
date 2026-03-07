@@ -67,11 +67,14 @@ class TestTable:
     def test_set_column_semantics_with_strings(self):
         """Test that string semantic names are coerced to Semantic enums."""
         table = Table(["Name", "Status"])
-        table.set_column_semantics(1, {
-            "valid": "SUCCESS",
-            "expired": "warning",
-            "revoked": "Error",
-        })
+        table.set_column_semantics(
+            1,
+            {
+                "valid": "SUCCESS",
+                "expired": "warning",
+                "revoked": "Error",
+            },
+        )
         mapping = table._column_semantics[1]
         assert mapping["valid"] is Semantic.SUCCESS
         assert mapping["expired"] is Semantic.WARNING
