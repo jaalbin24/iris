@@ -280,6 +280,10 @@ class UI:
         """Print a section header."""
         output.header(message)
 
+    def subheading(self, message: str) -> None:
+        """Print a subheading."""
+        output.subheading(message)
+
     def success(self, message: str) -> None:
         """Print a success message."""
         output.success(message)

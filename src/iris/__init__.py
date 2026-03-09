@@ -30,6 +30,7 @@ from .output import (
     duration,
     error,
     header,
+    subheading,
     hint,
     info,
     secure,
@@ -51,11 +52,10 @@ from .ui import UI, StatusListContext
 # Utilities
 from .utils import format_age, format_duration, format_size
 
-__version__ = "1.0.0"
-
 __all__ = [
     # Output functions
     "header",
+    "subheading",
     "success",
     "error",
     "warning",

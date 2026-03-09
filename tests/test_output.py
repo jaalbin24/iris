@@ -9,6 +9,7 @@ from iris import (
     duration,
     error,
     header,
+    subheading,
     hint,
     info,
     secure,
@@ -112,6 +113,13 @@ class TestOutputFunctions:
         captured = capsys.readouterr()
         assert "═" in captured.out
         assert "Test Header" in captured.out
+
+    def test_subheading_format(self, capsys):
+        """Test subheading format."""
+        subheading("Test Subheading")
+        captured = capsys.readouterr()
+        assert "─" in captured.out
+        assert "Test Subheading" in captured.out
 
     def test_box_format(self, capsys):
         """Test box format with double-line borders."""

@@ -60,6 +60,17 @@ class _Console:
         )
         self._print(output)
 
+    def subheading(self, message: str) -> None:
+        """Print a subheading with underline spanning terminal width."""
+        width = shutil.get_terminal_size().columns
+        line = "─" * width
+        output = (
+            f"\n"
+            f"{BOLD_WHITE}{message}{RESET}\n"
+            f"{line}\n"
+        )
+        self._print(output)
+
     def success(self, message: str) -> None:
         """Print success message with checkmark."""
         output = f"{BOLD_WHITE}[{BOLD_GREEN}✓{BOLD_WHITE}]{GREEN} {message}{RESET}"

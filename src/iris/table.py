@@ -122,9 +122,6 @@ class Table:
             header_parts.append(f"{BOLD_WHITE}{col:<{widths[i]}}{RESET}")
         header = "  ".join(header_parts)
 
-        # Separator line
-        separator = "─" * total_width
-
         # Data rows
         data_lines = []
         for row in self._rows:
@@ -141,7 +138,6 @@ class Table:
         # Print with thread safety
         with _get_console()._lock:
             print(header, flush=True)
-            print(separator, flush=True)
             for line in data_lines:
                 print(line, flush=True)
 
@@ -162,9 +158,6 @@ class Table:
         # Header row (without colors for string output)
         header_parts = [f"{col:<{widths[i]}}" for i, col in enumerate(self._columns)]
         lines.append("  ".join(header_parts))
-
-        # Separator
-        lines.append("─" * total_width)
 
         # Data rows (without colors)
         for row in self._rows:

@@ -21,6 +21,21 @@ def header(message: str) -> None:
     _get_console().header(message)
 
 
+def subheading(message: str) -> None:
+    """
+    Print a subheading with underline spanning terminal width.
+
+    Args:
+        message: Subheading text to display
+
+    Example:
+        >>> subheading("Certificates")
+        Certificates
+        ────────────────────────────────────────────────────────────────────────────────
+    """
+    _get_console().subheading(message)
+
+
 def success(message: str) -> None:
     """
     Print success message with checkmark.

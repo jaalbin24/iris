@@ -40,7 +40,7 @@ class TestTable:
         assert "Size" in captured.out
         assert "backup-01" in captured.out
         assert "backup-02" in captured.out
-        assert "─" in captured.out
+        assert "─" not in captured.out
 
     def test_render_to_string(self):
         """Test rendering table to string."""
@@ -52,7 +52,7 @@ class TestTable:
         assert "Size" in result
         assert "test" in result
         assert "1 GB" in result
-        assert "─" in result
+        assert "─" not in result
 
     def test_column_width_calculation(self):
         """Test that column widths adjust to content."""
