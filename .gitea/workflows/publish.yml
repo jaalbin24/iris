@@ -41,10 +41,8 @@ jobs:
         with:
           python-version: "3.11"
       - uses: snok/install-poetry@v1
-      - name: Set version from tag
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          poetry version "$VERSION"
+      - name: Install dynamic versioning plugin
+        run: pip install poetry-dynamic-versioning
       - name: Build package
         run: poetry build
       - name: Install Pulp CLI
