@@ -64,11 +64,7 @@ class _Console:
         """Print a subheading with underline spanning terminal width."""
         width = shutil.get_terminal_size().columns
         line = "─" * width
-        output = (
-            f"\n"
-            f"{BOLD_WHITE}{message}{RESET}\n"
-            f"{line}\n"
-        )
+        output = f"\n" f"{BOLD_WHITE}{message}{RESET}\n" f"{line}\n"
         self._print(output)
 
     def success(self, message: str) -> None:
