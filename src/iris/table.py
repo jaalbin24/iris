@@ -114,7 +114,6 @@ class Table:
     def render(self) -> None:
         """Print the table to stdout."""
         widths = self._calculate_widths()
-        total_width = sum(widths) + (len(widths) - 1) * 2  # 2 spaces between columns
 
         # Header row
         header_parts = []
@@ -151,7 +150,6 @@ class Table:
             The formatted table as a string
         """
         widths = self._calculate_widths()
-        total_width = sum(widths) + (len(widths) - 1) * 2
 
         lines = []
 

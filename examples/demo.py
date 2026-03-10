@@ -2,7 +2,7 @@
 """Demo script for README GIF recording."""
 import time
 
-from iris import UI, Table, danger_banner, header, success, error, warning, info
+from iris import UI, Table, danger_banner, error, header, info, success, warning
 
 
 def main():
