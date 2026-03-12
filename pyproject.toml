@@ -1,6 +1,6 @@
 [project]
 name = "kriib-iris"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Terminal UI library for CLI tools"
 readme = "README.md"
 authors = [{name = "Jeremy Albin", email = "jeremy.albin@kriib.com"}]
@@ -9,6 +9,7 @@ dependencies = []
 
 [tool.poetry]
 packages = [{ include = "iris", from = "src" }]
+version = "0.0.0"
 
 [dependency-groups]
 dev = [
